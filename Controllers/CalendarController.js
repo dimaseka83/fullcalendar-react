@@ -21,4 +21,5 @@ router.get("/get-event/:id", async (req, res) => {
     const event = await Event.findById(req.params.id);
     res.send(event);
 });
+
 module.exports = router;

@@ -5,6 +5,7 @@ import interactionPlugin from '@fullcalendar/interaction' // a plugin
 import AddEventModal from "./AddEventModal";
 import axios from "axios";
 import moment from "moment";
+import Datetime from 'react-datetime';
 export default function () {
     const [modalOpenAdd, setModalOpenAdd] = React.useState(false);
     const [events, setEvents] = React.useState([]);
@@ -32,11 +33,16 @@ export default function () {
     async function details(event) {
         const response = await axios.get("/api/calendar/get-event/" + event._def.extendedProps._id);
         setSelectedEvent(response.data);
+        console.log(response.data);
     }
 
     return (
         <section>
-            <button onClick={() => setModalOpenAdd(true)}>Add Event</button>
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                    <button onClick={() => setModalOpenAdd(true)}>Add Event</button>
             <div style={{position: "relative", zIndex: 0}}>
             <FullCalendar
                     ref={calendarRef}
@@ -49,8 +55,17 @@ export default function () {
                 />
             </div>
             <AddEventModal isOpen={modalOpenAdd} onClose={() => setModalOpenAdd(false)} onEventAdded={event => onEventAdded(event)} /> 
-            <p>{selectedEvent.title}</p>
+                    </td>
+                    <td>
+                    <form>
+                        <input type="text" value={selectedEvent.title} />
+                        <Datetime value={selectedEvent.start}></Datetime>
+                        <button>Save</button>
+                    </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </section>
-
     )
 }

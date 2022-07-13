@@ -6,9 +6,9 @@ import AddEventModal from "./AddEventModal";
 import axios from "axios";
 import moment from "moment";
 export default function () {
-    const [modalOpen, setModalOpen] = React.useState(false);
+    const [modalOpenAdd, setModalOpenAdd] = React.useState(false);
     const [events, setEvents] = React.useState([]);
-    const [selectedEvent, setSelectedEvent] = React.useState(null);
+    const [selectedEvent, setSelectedEvent] = React.useState([]);
     const calendarRef = React.useRef(null);
     
 
@@ -20,7 +20,6 @@ export default function () {
             title: event.title
         });
     }
-
     async function handleEventAdd(data) {
         await axios.post("/api/calendar/create-event", data.event);
     }
@@ -31,24 +30,27 @@ export default function () {
     }
 
     async function details(event) {
-        console.log(event);
+        const response = await axios.get("/api/calendar/get-event/" + event._def.extendedProps._id);
+        setSelectedEvent(response.data);
     }
 
     return (
         <section>
-            <button onClick={() => setModalOpen(true)}>Add Event</button>
+            <button onClick={() => setModalOpenAdd(true)}>Add Event</button>
             <div style={{position: "relative", zIndex: 0}}>
             <FullCalendar
                     ref={calendarRef}
                     events={events}
                     plugins={[ dayGridPlugin, interactionPlugin ]}
                     initialView="dayGridMonth"
-                    dateClick={(arg) => details(arg)}
+                    eventClick={(event) => details(event.event)}
                     eventAdd={(event) => handleEventAdd(event)}
                     datesSet={(date) => handleDataSet(date)}
                 />
             </div>
-            <AddEventModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onEventAdded={event => onEventAdded(event)} /> 
+            <AddEventModal isOpen={modalOpenAdd} onClose={() => setModalOpenAdd(false)} onEventAdded={event => onEventAdded(event)} /> 
+            <p>{selectedEvent.title}</p>
         </section>
+
     )
 }
